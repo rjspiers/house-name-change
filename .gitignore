@@ -1,0 +1,5 @@
+# ignore dir
+bower_components/
+node_modules/
+.c9/
+.git/

@@ -1,0 +1,22 @@
+{
+  "name": "house-name-change",
+  "description": "",
+  "main": "server.js",
+  "authors": [
+    "Robert Spiers"
+  ],
+  "license": "ISC",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "^1.6.4",
+    "bootstrap": "^3.3.7"
+  }
+}

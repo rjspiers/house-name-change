@@ -1,0 +1,150 @@
+<!-- views/pages/about.ejs -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<% include ../partials/head %>
+</head>
+<body class="container">
+
+	<header>
+		<% include ../partials/header %>
+	</header>
+
+	<main>
+	<div class="section">
+		<h3># <span>Change the name of your house</span></h3>
+		<div>
+			<div class="row">
+				<div class="col-md-12">
+					<p>These pages contain angular webform</p>
+				</div>
+			</div>
+		</div>
+		<hr>
+		
+		<!--angular app-->
+    <div class="container-fluid" ng-app="app" ng-controller="appCtrl">
+      <!--show postcode search-->
+      <div ng-show="selectedAddress.data.length == 0">
+        <h3>Search for your existing property</h3>
+        <p>Type postcode and hit search</p>
+        <form ng-submit="addressSearch()">
+          <div class="form-group">
+            <div class="input-group">
+              <input type="text" name="searchValue" ng-model="searchValue" class="form-control" placeholder="Search by postcode">
+              <span class="input-group-btn">
+                <button type="submit" class="btn btn-primary">Search</button>
+              </span>
+            </div>
+          </div>
+        </form>
+      </div>
+      
+      <!--show results.data -->
+      <div ng-show="results.data.length > 0" style="display:block;">
+        <h3>Select Your Property</h3>
+        <p>Select from the list or retry the search</p>
+        <a style="display:block; cursor:pointer;" ng-repeat="x in results.data" ng-click="selectAddress(x)">{{x.uprn}} | {{x.property}} | {{x.street}}</a>
+    	  <pre>{{results.data | json}}</pre>
+      </div>  
+      
+      <!--show selected address-->
+      <div ng-show="selectedAddress.data.length > 0" style="display:block;">
+        <p>add reset button here</p>
+        <h3>Your Property</h3>
+        <p ng-repeat="x in selectedAddress.data">{{x.uprn}} | {{x.property}} | {{x.street}}</p>
+    	  <pre>{{selectedAddress.data | json}}</pre>
+      </div>
+    
+      <!--show house name checker search-->
+      <div ng-show="selectedAddress.data.length > 0 "> <!-- && hasNewHouseNameBeenChecked === 'false' -->
+        <h3>Check your new House Name</h3>
+        <p>Type your new house name and hit check button to test if it is acceptable</p>
+        <form ng-submit="newHouseNameCheck()">
+          <div class="form-group">
+            <div class="input-group">
+              <input type="text" name="newHouseName" ng-model="newHouseName" class="form-control" placeholder="Type your new house name">
+              <span class="input-group-btn">
+                <button type="submit" class="btn btn-primary">Check Name</button>
+              </span>
+            </div>
+          </div>
+        </form>
+      </div>
+      
+	  <div ng-show="hasNewHouseNameBeenChecked === true">
+        <h3>Rule results</h3>
+        <p>See which rules have passed or failed</p>
+		<div class="container-fluid">
+			<table class="table table-striped table-bordered">
+				<tr>
+					<th>Rule</th>
+					<th>Status</th>
+					<th>Example</th>
+				</tr>
+				<tr>
+					<td>Identical Names in USRN</td>
+					<td ng-show="nameCheckResponse.data.nameChecks.identicalNameInUSRN.length"><span class="label label-danger">Fail</span></td>
+					<td ng-show="nameCheckResponse.data.nameChecks.identicalNameInUSRN.length === 0"><span class="label label-success">Pass</span></td>
+					<td ng-show="nameCheckResponse.data.nameChecks.identicalNameInUSRN.length"><pre>{{nameCheckResponse.data.nameChecks.identicalNameInUSRN | json}}</pre></td>
+					<td ng-show="nameCheckResponse.data.nameChecks.identicalNameInUSRN.length === 0"></td>
+				</tr>
+				<tr>
+					<td>Identical Names in Postcode Sector</td>
+					<td ng-show="nameCheckResponse.data.nameChecks.identicalNameInPostcodeSector.length"><span class="label label-danger">Fail</span></td>
+					<td ng-show="nameCheckResponse.data.nameChecks.identicalNameInPostcodeSector.length === 0"><span class="label label-success">Pass</span></td>
+					<td ng-show="nameCheckResponse.data.nameChecks.identicalNameInPostcodeSector.length"><pre>{{nameCheckResponse.data.nameChecks.identicalNameInPostcodeSector | json}}</pre></td>
+					<td ng-show="nameCheckResponse.data.nameChecks.identicalNameInPostcodeSector.length === 0"></td>
+				</tr>
+				<tr>
+					<td>Similar Sounding Names in USRN</td>
+					<td ng-show="nameCheckResponse.data.nameChecks.similarNameInUSRN.length"><span class="label label-danger">Fail</span></td>
+					<td ng-show="nameCheckResponse.data.nameChecks.similarNameInUSRN.length === 0"><span class="label label-success">Pass</span></td>
+					<td ng-show="nameCheckResponse.data.nameChecks.similarNameInUSRN.length"><pre>{{nameCheckResponse.data.nameChecks.similarNameInUSRN | json}}</pre></td>
+					<td ng-show="nameCheckResponse.data.nameChecks.similarNameInUSRN.length === 0"></td>
+				</tr>
+				<tr>
+					<td>Similar Sounding Names in Postcode Sector</td>
+					<td ng-show="nameCheckResponse.data.nameChecks.similarNameInPostcodeSector.length"><span class="label label-danger">Fail</span></td>
+					<td ng-show="nameCheckResponse.data.nameChecks.similarNameInPostcodeSector.length === 0"><span class="label label-success">Pass</span></td>
+					<td ng-show="nameCheckResponse.data.nameChecks.similarNameInPostcodeSector.length"><pre>{{nameCheckResponse.data.nameChecks.similarNameInPostcodeSector | json}}</pre></td>
+					<td ng-show="nameCheckResponse.data.nameChecks.similarNameInPostcodeSector.length === 0"></td>
+				</tr>
+			</table>
+		</div>
+      </div>
+	  
+      <!--show summary and submit house name change request-->
+      <!--TODO add if name has been checked and is acceptable-->
+      <div ng-show="hasNewHouseNameBeenChecked === true">
+        <h3>Summary before submit</h3>
+        <p>Please check the following details are what you are requesting. Then hit submit and we will process the change.</p>
+        <form ng-submit="submitHouseNameChangeRequest()">
+          <div class="form-group">
+            <div class="input-group">
+              <p ng-repeat="x in selectedAddress.data">Current Address: {{x.uprn}} | {{x.property}} | {{x.street}}</p>
+              <p>New Address: {{newHouseName}}</p>
+              <span class="input-group-btn">
+                <button type="submit" class="btn btn-primary">Submit Request</button>
+              </span>
+            </div>
+          </div>
+        </form>
+        
+      </div>
+
+    </div> 
+    <!--end angular app-->
+    
+	</div>
+	</main>
+	
+<script src="<%= process.env.iisnodeRoute %>/public/src/js/nameCheckerApp.js"></script>
+
+	<footer>
+		<% include ../partials/footer %>
+	</footer>
+    
+</body>
+</html>

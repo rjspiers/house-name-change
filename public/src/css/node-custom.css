@@ -1,0 +1,105 @@
+/* loading spinner */
+.loader {
+  border: 8px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 8px solid #3498db;
+  width: 60px;
+  height: 60px;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+}
+
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+/* loading spinner end */
+
+/* GBC website styling */
+html {
+	position: relative; 
+	min-height: 100%; /* for sticky footer */ 
+}
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: "Droid Sans", sans-serif;
+	margin-bottom: 79px; /* for sticky footer */
+}
+
+#content {
+    padding: 50px 10px;
+}
+
+
+/* header styling */
+header {
+    padding: 20px 0;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    -webkit-box-shadow: 0 3px 16px 0px rgba(0, 0, 0, 0.19);
+    -moz-box-shadow: 0 3px 16px 0px rgba(0, 0, 0, 0.19);
+    box-shadow: 0 3px 16px 0px rgba(0, 0, 0, 0.19);
+}
+
+.container {
+    max-width: 1000px;
+    margin: auto;
+    padding: 0 20px;
+}
+
+/* footer styling */
+footer {
+    clear: both;
+    color: white;
+    background: #3D3D3D;
+    overflow: hidden;
+    padding: 0;
+    padding: 1em 0;
+    margin-top: 0;
+	
+    position: absolute; /* for sticky footer */
+	width: 100%; /* for sticky footer */
+	bottom: 0; /* for sticky footer */
+	
+}
+	
+footer .container {
+    display: table;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.footer__logo {
+    text-align: right;
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.copyright {
+    text-align: left;
+    display: table-cell;
+    vertical-align: middle;
+}
+
+@media (max-width: 700px) {
+	.footer__logo,
+	.copyright {
+		text-align: center;
+		display: block;
+	}
+	.copyright {
+		margin-bottom: 20px;
+	}
+}
+/* GBC website styling end */
