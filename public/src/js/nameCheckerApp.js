@@ -5,6 +5,9 @@ app.controller('appCtrl', function($scope, $http) {
 	// SDS
     $scope.results = {};
     $scope.results.data = [];
+	$scope.results.statusCode = null;
+	$scope.results.message = null
+	$scope.results.messageClass = null
 	// user property selection
     $scope.selectedAddress = {};
     $scope.selectedAddress.data = [];
@@ -25,19 +28,44 @@ app.controller('appCtrl', function($scope, $http) {
 	// Search SDS address
     $scope.addressSearch = function () {
         $scope.results.data = []; // reset results
+		$scope.selectedAddress.data = []; // clear selected address
         var config = {
             params: {
                 'postcode': $scope.searchValue
             }
         };
         console.log('$scope.searchValue : ' + $scope.searchValue);
-    	$http.get(iisnodeRoute + '/api/postcode', config).then(function (response) {
+    	responsePromise = $http.get(iisnodeRoute + '/api/postcode', config)
+		
+		// promise.then(onFullfilled, onRejected)
+		responsePromise.then(function (response) {
+            // status code
+			console.log('response.statusCode : ' + response.status);
+			$scope.results.statusCode = response.status;
+			// data
             console.log('response.data : ' + response.data);
     		$scope.results.data = response.data; // update results data
+			// length of response data
     		console.log('$scope.results.data.length : ' + $scope.results.data.length);
-    		$scope.selectedAddress.data = []; // clear selected address
-    	});  
+    	}, function (response) {
+			console.log(response)
+			//$scope.results.statusCode = statusCode
+			$scope.results.statusCode = response.status;
+			$scope.results.message = response.data.error;
+			$scope.results.messageClass = 'label label-danger'
+		});  
     };
+	
+/* 	function (response) {
+			var statusCode = response.status;
+			$scope.results.data = [];
+			switch (statusCode) {
+				case 422:
+					$scope.results.statusCode = statusCode;
+					break;
+				default:
+					$scope.results.statusCode = 500;
+			} */
 
 	// Select address from list
     $scope.selectAddress = function (item) {

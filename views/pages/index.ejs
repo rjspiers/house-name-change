@@ -13,7 +13,7 @@
 
 	<main>
 	<div class="container">
-	<p class="pull-right"><span class="label label-success"><%= process.env.version %></span></p>
+	<p class="pull-right"><span class="label label-success">Alpha 1</span></p>
 	
 	<div class="section" id="content">
 		<h3>Check if a New House Name is Acceptable</h3>
@@ -41,6 +41,9 @@
               </span>
             </div>
           </div>
+		<div ng-show="results.statusCode===422">
+			<h3><label class="{{results.messageClass}}">Error {{results.statusCode}}: {{results.message}}</label></h3>
+		</div>
         </form>
       </div>
       
