@@ -5,7 +5,7 @@ app.controller('appCtrl', function($scope, $http) {
 	// SDS
     $scope.results = {};
     $scope.results.data = [];
-	$scope.results.statusCode = null;
+	$scope.results.statusCode = 200;
 	$scope.results.message = null
 	$scope.results.messageClass = null
 	// user property selection
@@ -35,7 +35,7 @@ app.controller('appCtrl', function($scope, $http) {
             }
         };
         console.log('$scope.searchValue : ' + $scope.searchValue);
-    	responsePromise = $http.get(iisnodeRoute + '/api/postcode', config)
+    	responsePromise = $http.get(iisnodeRoute + '/api/postcodeGssCode', config)
 		
 		// promise.then(onFullfilled, onRejected)
 		responsePromise.then(function (response) {
@@ -55,17 +55,6 @@ app.controller('appCtrl', function($scope, $http) {
 			$scope.results.messageClass = 'label label-danger'
 		});  
     };
-	
-/* 	function (response) {
-			var statusCode = response.status;
-			$scope.results.data = [];
-			switch (statusCode) {
-				case 422:
-					$scope.results.statusCode = statusCode;
-					break;
-				default:
-					$scope.results.statusCode = 500;
-			} */
 
 	// Select address from list
     $scope.selectAddress = function (item) {

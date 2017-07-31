@@ -41,7 +41,7 @@
               </span>
             </div>
           </div>
-		<div ng-show="results.statusCode===422">
+		<div ng-show="results.statusCode!=200">
 			<h3><label class="{{results.messageClass}}">Error {{results.statusCode}}: {{results.message}}</label></h3>
 		</div>
         </form>

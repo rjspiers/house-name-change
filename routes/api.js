@@ -14,6 +14,18 @@ router.get('/', function(req, res) {
     res.send(JSON.stringify({ api_message: "api is here" }, null, 2));
 });
 
+router.get('/testDbConn', function(req, res) {
+	pool.query('SELECT 1 AS number', [], function(err, results) {
+		if (err) {
+			return console.error('error running query', err);
+		}
+		res.json({
+			status: 'success',
+			testDbConn: results.rows
+		})
+	}) // pool.query
+})
+
 // https://house-name-change-rjspiers.c9users.io/searchApi/postcode?postcode=gu13au
 router.get('/postcode', function(req, res, next) {
     var postcode = req.query.postcode;
@@ -26,6 +38,31 @@ router.get('/postcode', function(req, res, next) {
         } else {
             var message = '{"error":"internal server error"}'
             res.status(500).send(JSON.parse(message));
+        }
+    });
+});
+
+router.get('/postcodeGssCode', function(req, res, next) {
+    var postcode = req.query.postcode;
+    request('https://address.digitalservices.surreyi.gov.uk/addresses?postcode=' + postcode, 
+        {'auth': {'bearer': process.env.bearerToken}}, function (err, response, body) {
+        if (err || response.statusCode !== 200) {
+            res.status(response.statusCode).send(JSON.parse(body)); // example 422 = {"error":"postcode is invalid"}
+        } else if (response.statusCode === 200) {
+			var jsonArray = JSON.parse(response.body)
+			console.log(jsonArray)
+			var filteredJsonArray = jsonArray.filter(function(obj) {
+				return (obj.gssCode === 'E07000209')
+			})
+			console.log('filteredJsonArray = ' + JSON.stringify(filteredJsonArray))
+			if (filteredJsonArray.length > 0) {
+				res.json(filteredJsonArray);
+			} else if (filteredJsonArray.length === 0) {
+				res.status(422).json({"error":"no Guildford addresses in this postcode"})
+			}
+        } else {
+            var message = '{"error":"internal server error"}'
+            res.status(500).json(message);
         }
     });
 });
@@ -78,7 +115,7 @@ router.get('/nameCheck', function(req, res) {
 	
 	function getRecordDetail () { 
 		return new Promise (function (resolve, reject) {
-			pool.query('SELECT trim(uprn) As uprn, usrn, isparent, ischild, postcode_sector FROM node_schema.llpg_all_live_addresses WHERE uprn = $1 AND logical_status = \'1\' LIMIT 1', [q.uprn], function(err, results) {
+			pool.query('SELECT trim(uprn) As uprn, usrn, isparent, ischild, postcode_sector FROM gis_schema.llpg_all_live_addresses WHERE uprn = $1 AND logical_status = \'1\' LIMIT 1', [q.uprn], function(err, results) {
 				if (err) {
 					return console.error('error running query', err);
 				}
@@ -97,7 +134,7 @@ router.get('/nameCheck', function(req, res) {
 	
 	function identicalNameInUSRN () { 
 		return new Promise (function (resolve, reject) {
-			pool.query('SELECT paon_text FROM node_schema.llpg_all_live_addresses WHERE usrn = $2 AND lower(paon_text) = $1', [q.newHouseName.toLowerCase(), recordDetail.usrn], function(err, results) {
+			pool.query('SELECT paon_text FROM gis_schema.llpg_all_live_addresses WHERE usrn = $2 AND lower(paon_text) = $1', [q.newHouseName.toLowerCase(), recordDetail.usrn], function(err, results) {
 				if (err) {
 					return console.error('error running query', err);
 				}
@@ -113,7 +150,7 @@ router.get('/nameCheck', function(req, res) {
 	
 	function identicalNameInPostcodeSector () { 
 		return new Promise (function (resolve, reject) {
-			pool.query('SELECT paon_text FROM node_schema.llpg_all_live_addresses WHERE postcode_sector = $2 AND lower(paon_text) = $1', [q.newHouseName.toLowerCase(), recordDetail.postcode_sector], function(err, results) {
+			pool.query('SELECT paon_text FROM gis_schema.llpg_all_live_addresses WHERE postcode_sector = $2 AND lower(paon_text) = $1', [q.newHouseName.toLowerCase(), recordDetail.postcode_sector], function(err, results) {
 				if (err) {
 					return console.error('error running query', err);
 				}
@@ -129,7 +166,7 @@ router.get('/nameCheck', function(req, res) {
 	
 	function similarNameInUSRN () { 
 		return new Promise (function (resolve, reject) {
-			pool.query('SELECT paon_text, metaphone($1, 255) FROM node_schema.llpg_all_live_addresses WHERE usrn = $2 AND metaphone(paon_text, 255) = metaphone($1, 255)', [q.newHouseName, recordDetail.usrn], function(err, results) {
+			pool.query('SELECT paon_text, metaphone($1, 255) FROM gis_schema.llpg_all_live_addresses WHERE usrn = $2 AND metaphone(paon_text, 255) = metaphone($1, 255)', [q.newHouseName, recordDetail.usrn], function(err, results) {
 				if (err) {
 					return console.error('error running query', err);
 				}
@@ -145,7 +182,7 @@ router.get('/nameCheck', function(req, res) {
 	
 	function similarNameInPostcodeSector () { 
 		return new Promise (function (resolve, reject) {
-			pool.query('SELECT paon_text, metaphone($1, 255) FROM node_schema.llpg_all_live_addresses WHERE postcode_sector = $2 AND metaphone(paon_text, 255) = metaphone($1, 255)', [q.newHouseName, recordDetail.postcode_sector], function(err, results) {
+			pool.query('SELECT paon_text, metaphone($1, 255) FROM gis_schema.llpg_all_live_addresses WHERE postcode_sector = $2 AND metaphone(paon_text, 255) = metaphone($1, 255)', [q.newHouseName, recordDetail.postcode_sector], function(err, results) {
 				if (err) {
 					return console.error('error running query', err);
 				}
