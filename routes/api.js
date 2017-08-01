@@ -32,7 +32,7 @@ router.get('/postcodeUk', function(req, res, next) {
     request('https://address.digitalservices.surreyi.gov.uk/addresses?postcode=' + postcode, 
         {'auth': {'bearer': process.env.bearerToken}}, function (err, response, body) {
         if (err || response.statusCode !== 200) {
-            res.status(response.statusCode).json(body); // example 422 = {"error":"postcode is invalid"}
+            res.status(response.statusCode).json(JSON.parse(body)); // example 422 = {"error":"postcode is invalid"}
         } else if (response.statusCode === 200) {
             res.json(body);
         } else {
@@ -48,7 +48,7 @@ router.get('/postcode', function(req, res, next) {
     request('https://address.digitalservices.surreyi.gov.uk/addresses?postcode=' + postcode, 
         {'auth': {'bearer': process.env.bearerToken}}, function (err, response, body) {
         if (err || response.statusCode !== 200) {
-            res.status(response.statusCode).json(body); // example 422 = {"error":"postcode is invalid"}
+            res.status(response.statusCode).json(JSON.parse(body)); // example 422 = {"error":"postcode is invalid"}
         } else if (response.statusCode === 200) {
 			var jsonArray = JSON.parse(response.body)
 			var filteredJsonArray = jsonArray.filter(function(obj) {
@@ -72,7 +72,7 @@ router.get('/postcodeStatic', function(req, res, next) {
     request('https://address.digitalservices.surreyi.gov.uk/addresses?postcode=' + postcode, 
         {'auth': {'bearer': process.env.bearerToken}}, function (err, response, body) {
         if (err || response.statusCode !== 200) {
-            res.status(response.statusCode).json(body); // example 422 = {"error":"postcode is invalid"}
+            res.status(response.statusCode).json(JSON.parse(body)); // example 422 = {"error":"postcode is invalid"}
         } else if (response.statusCode === 200) {
             res.json(body);
         } else {
