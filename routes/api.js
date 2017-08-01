@@ -34,7 +34,7 @@ router.get('/postcodeUk', function(req, res, next) {
         if (err || response.statusCode !== 200) {
             res.status(response.statusCode).json(JSON.parse(body)); // example 422 = {"error":"postcode is invalid"}
         } else if (response.statusCode === 200) {
-            res.json(body);
+            res.json(JSON.parse(body));
         } else {
             var message = '{"error":"internal server error"}'
             res.status(500).json(message);
@@ -74,7 +74,7 @@ router.get('/postcodeStatic', function(req, res, next) {
         if (err || response.statusCode !== 200) {
             res.status(response.statusCode).json(JSON.parse(body)); // example 422 = {"error":"postcode is invalid"}
         } else if (response.statusCode === 200) {
-            res.json(body);
+            res.json(JSON.parse(body));
         } else {
             var message = '{"error":"internal server error"}'
             res.status(500).json(message);
