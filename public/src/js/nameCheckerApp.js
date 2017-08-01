@@ -35,7 +35,7 @@ app.controller('appCtrl', function($scope, $http) {
             }
         };
         console.log('$scope.searchValue : ' + $scope.searchValue);
-    	responsePromise = $http.get(iisnodeRoute + '/api/postcodeGssCode', config)
+    	responsePromise = $http.get(iisnodeRoute + '/api/postcode', config)
 		
 		// promise.then(onFullfilled, onRejected)
 		responsePromise.then(function (response) {

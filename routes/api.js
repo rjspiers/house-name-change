@@ -26,39 +26,38 @@ router.get('/testDbConn', function(req, res) {
 	}) // pool.query
 })
 
-// https://house-name-change-rjspiers.c9users.io/searchApi/postcode?postcode=gu13au
+// /api/postcodeUk?postcode=gu13au
+router.get('/postcodeUk', function(req, res, next) {
+    var postcode = req.query.postcode;
+    request('https://address.digitalservices.surreyi.gov.uk/addresses?postcode=' + postcode, 
+        {'auth': {'bearer': process.env.bearerToken}}, function (err, response, body) {
+        if (err || response.statusCode !== 200) {
+            res.status(response.statusCode).json(body); // example 422 = {"error":"postcode is invalid"}
+        } else if (response.statusCode === 200) {
+            res.json(body);
+        } else {
+            var message = '{"error":"internal server error"}'
+            res.status(500).json(message);
+        }
+    });
+});
+
+// /api/postcode?postcode=gu13au
 router.get('/postcode', function(req, res, next) {
     var postcode = req.query.postcode;
     request('https://address.digitalservices.surreyi.gov.uk/addresses?postcode=' + postcode, 
         {'auth': {'bearer': process.env.bearerToken}}, function (err, response, body) {
         if (err || response.statusCode !== 200) {
-            res.status(response.statusCode).send(JSON.parse(body)); // example 422 = {"error":"postcode is invalid"}
-        } else if (response.statusCode === 200) {
-            res.send(JSON.parse(body));
-        } else {
-            var message = '{"error":"internal server error"}'
-            res.status(500).send(JSON.parse(message));
-        }
-    });
-});
-
-router.get('/postcodeGssCode', function(req, res, next) {
-    var postcode = req.query.postcode;
-    request('https://address.digitalservices.surreyi.gov.uk/addresses?postcode=' + postcode, 
-        {'auth': {'bearer': process.env.bearerToken}}, function (err, response, body) {
-        if (err || response.statusCode !== 200) {
-            res.status(response.statusCode).send(JSON.parse(body)); // example 422 = {"error":"postcode is invalid"}
+            res.status(response.statusCode).json(body); // example 422 = {"error":"postcode is invalid"}
         } else if (response.statusCode === 200) {
 			var jsonArray = JSON.parse(response.body)
-			console.log(jsonArray)
 			var filteredJsonArray = jsonArray.filter(function(obj) {
 				return (obj.gssCode === 'E07000209')
 			})
-			console.log('filteredJsonArray = ' + JSON.stringify(filteredJsonArray))
 			if (filteredJsonArray.length > 0) {
 				res.json(filteredJsonArray);
 			} else if (filteredJsonArray.length === 0) {
-				res.status(422).json({"error":"no Guildford addresses in this postcode"})
+				res.status(422).json({"error":"no Guildford Borough addresses in this postcode"})
 			}
         } else {
             var message = '{"error":"internal server error"}'
@@ -67,23 +66,23 @@ router.get('/postcodeGssCode', function(req, res, next) {
     });
 });
 
-// https://house-name-change-rjspiers.c9users.io/searchApi/postcodeStatic
+// /api/postcodeStatic
 router.get('/postcodeStatic', function(req, res, next) {
     var postcode = 'gu13au';
     request('https://address.digitalservices.surreyi.gov.uk/addresses?postcode=' + postcode, 
         {'auth': {'bearer': process.env.bearerToken}}, function (err, response, body) {
         if (err || response.statusCode !== 200) {
-            res.status(response.statusCode).send(JSON.parse(body)); // example 422 = {"error":"postcode is invalid"}
+            res.status(response.statusCode).json(body); // example 422 = {"error":"postcode is invalid"}
         } else if (response.statusCode === 200) {
-            res.send(JSON.parse(body));
+            res.json(body);
         } else {
             var message = '{"error":"internal server error"}'
-            res.status(500).send(JSON.parse(message));
+            res.status(500).json(message);
         }
     });
 });
 
-// https://house-name-change-rjspiers.c9users.io/searchApi/uprn?uprn=10007099272
+// /api/uprn?uprn=10007099272
 router.get('/uprn', function(req, res, next) {
     var uprn = req.query.uprn;
     request('https://address.digitalservices.surreyi.gov.uk/addresses?format=all&uprn=' + uprn, 
@@ -97,6 +96,7 @@ router.get('/uprn', function(req, res, next) {
     });
 });
 
+// /api/nameCheck?newHouseName=Beechanger&uprn=10007060106
 router.get('/nameCheck', function(req, res) {
 	logger.info(req.query.uprn + ',' + req.query.newHouseName)
 	// q.uprn & q.newHouseName
