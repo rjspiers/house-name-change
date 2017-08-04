@@ -8,15 +8,15 @@ A checking service for proposed house name changes
 - Configured to run through IIS using [iisnode](https://github.com/tjanczuk/iisnode)
 
 ### Routes
-Application host: https://www2.guildford.gov.uk
-URL path to API: [/node/house-name-check/api](https://www2.guildford.gov.uk/node/house-name-check/api)
-Friendly frontend: https://www2.guildford.gov.uk/node/house-name-check
+- Application host: https://www2.guildford.gov.uk
+- URL path to API: [/node/house-name-check/api](https://www2.guildford.gov.uk/node/house-name-check/api)
+- Friendly frontend: https://www2.guildford.gov.uk/node/house-name-check
 
 ### API 
 | Method | Endpoint | Params | Description | 
 | ------ | ------ | ------ | ------ | 
-| GET | [/postcode](#Postcode) | postcode=string | returns json of Guildford Borough addresses within a postcode | 
-| GET | [/nameCheck](#nameCheck) | <ul><li>uprn=string</li><li>newHouseName=string</li></ul> | returns json of name check results using uprn |
+| GET | [/postcode](#postcode) | postcode=string | returns json of Guildford Borough addresses within a postcode | 
+| GET | [/nameCheck](#namecheck) | <ul><li>uprn=string</li><li>newHouseName=string</li></ul> | returns json of name check results using uprn |
 | GET | /postcodeUk | postcode=string | returns json of addresses within a postcode |
 | GET | /postcodeStatic | - | returns json of addresses within a one postcode |
 | GET | /testDbConn | - | returns json of simple sql query to check db is available to application api|
