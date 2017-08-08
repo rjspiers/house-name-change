@@ -41,15 +41,11 @@ app.use(bodyParser.urlencoded({extended: true})) // to support URL-encoded bodie
 
 /* routers */
 var routerIndex = require('./routes/index');
-var routerAbout = require('./routes/about');
 var routerApi = require('./routes/api');
-var routerNameChecker = require('./routes/nameChecker');
 
 /* set routes */
 app.use(process.env.iisnodeRoute + '/', routerIndex);
-app.use(process.env.iisnodeRoute + '/about', routerAbout);
 app.use(process.env.iisnodeRoute + '/api', routerApi);
-app.use(process.env.iisnodeRoute + '/nameChecker', routerNameChecker);
 
 // c9
 app.listen(process.env.PORT, process.env.IP);

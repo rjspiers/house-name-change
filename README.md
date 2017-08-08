@@ -44,10 +44,10 @@ Example response:
     "identicalNameInPostcodeSector": [
       "BEECHANGER"
     ],
-    "similarNameInUSRN": [
+    "identicalSoundingNameInUSRN": [
       "BEECHANGER"
     ],
-    "similarNameInPostcodeSector": [
+    "identicalSoundingNameInPostcodeSector": [
       "BEECHANGER"
     ],
     "recordDetail": {
@@ -69,6 +69,6 @@ Example response:
 | profanityDetected | boolean | true if profanity detected |
 | identicalNameInUSRN | array | identical names within the same USRN |
 | identicalNameInPostcodeSector | array | identical names within the same postcode sector (GU1 1) |
-| similarNameInUSRN | array | identical sounding names within the same USRN |
-| similarNameInPostcodeSector | array | identical sounding names within the same postcode sector (GU1 1) |
+| identicalSoundingNameInUSRN | array | identical sounding names within the same USRN |
+| identicalSoundingNameInPostcodeSector | array | identical sounding names within the same postcode sector (GU1 1) |
 | recordDetail | json | data on the requested UPRN used by the API to conduct the name checking |

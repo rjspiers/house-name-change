@@ -105,17 +105,17 @@
 				</tr>
 				<tr>
 					<td>Similar Sounding Names in Same Street</td>
-					<td ng-show="nameCheckResponse.data.nameChecks.similarNameInUSRN.length"><h3><span class="label label-danger">Fail</span></h3></td>
-					<td ng-show="nameCheckResponse.data.nameChecks.similarNameInUSRN.length === 0"><h3><span class="label label-success">Pass</span></h3></td>
-					<td ng-show="nameCheckResponse.data.nameChecks.similarNameInUSRN.length"><pre>{{nameCheckResponse.data.nameChecks.similarNameInUSRN | json}}</pre></td>
-					<td ng-show="nameCheckResponse.data.nameChecks.similarNameInUSRN.length === 0"></td>
+					<td ng-show="nameCheckResponse.data.nameChecks.identicalSoundingNameInUSRN.length"><h3><span class="label label-danger">Fail</span></h3></td>
+					<td ng-show="nameCheckResponse.data.nameChecks.identicalSoundingNameInUSRN.length === 0"><h3><span class="label label-success">Pass</span></h3></td>
+					<td ng-show="nameCheckResponse.data.nameChecks.identicalSoundingNameInUSRN.length"><pre>{{nameCheckResponse.data.nameChecks.identicalSoundingNameInUSRN | json}}</pre></td>
+					<td ng-show="nameCheckResponse.data.nameChecks.identicalSoundingNameInUSRN.length === 0"></td>
 				</tr>
 				<tr>
 					<td>Similar Sounding Names Same Postcode Sector</td>
-					<td ng-show="nameCheckResponse.data.nameChecks.similarNameInPostcodeSector.length"><h3><span class="label label-danger">Fail</span></h3></td>
-					<td ng-show="nameCheckResponse.data.nameChecks.similarNameInPostcodeSector.length === 0"><h3><span class="label label-success">Pass</span></h3></td>
-					<td ng-show="nameCheckResponse.data.nameChecks.similarNameInPostcodeSector.length"><pre>{{nameCheckResponse.data.nameChecks.similarNameInPostcodeSector | json}}</pre></td>
-					<td ng-show="nameCheckResponse.data.nameChecks.similarNameInPostcodeSector.length === 0"></td>
+					<td ng-show="nameCheckResponse.data.nameChecks.identicalSoundingNameInPostcodeSector.length"><h3><span class="label label-danger">Fail</span></h3></td>
+					<td ng-show="nameCheckResponse.data.nameChecks.identicalSoundingNameInPostcodeSector.length === 0"><h3><span class="label label-success">Pass</span></h3></td>
+					<td ng-show="nameCheckResponse.data.nameChecks.identicalSoundingNameInPostcodeSector.length"><pre>{{nameCheckResponse.data.nameChecks.identicalSoundingNameInPostcodeSector | json}}</pre></td>
+					<td ng-show="nameCheckResponse.data.nameChecks.identicalSoundingNameInPostcodeSector.length === 0"></td>
 				</tr>
 				<tr>
 					<td>Profanity Detection</td>

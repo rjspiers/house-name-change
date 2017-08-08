@@ -106,8 +106,8 @@ router.get('/nameCheck', function(req, res) {
 	nameChecks.profanityDetected = null
 	nameChecks.identicalNameInUSRN = {}
 	nameChecks.identicalNameInPostcodeSector = {}
-	nameChecks.similarNameInUSRN = {}
-	nameChecks.similarNameInPostcodeSector = {}
+	nameChecks.identicalSoundingNameInUSRN = {}
+	nameChecks.identicalSoundingNameInPostcodeSector = {}
 	nameChecks.recordDetail = {}
 	
 	recordDetail = {}
@@ -164,7 +164,7 @@ router.get('/nameCheck', function(req, res) {
 		})
 	}
 	
-	function similarNameInUSRN () { 
+	function identicalSoundingNameInUSRN () { 
 		return new Promise (function (resolve, reject) {
 			pool.query('SELECT paon_text, metaphone($1, 255) FROM node_schema.llpg_all_live_addresses WHERE usrn = $2 AND metaphone(paon_text, 255) = metaphone($1, 255)', [q.newHouseName, recordDetail.usrn], function(err, results) {
 				if (err) {
@@ -174,13 +174,13 @@ router.get('/nameCheck', function(req, res) {
 				results.rows.forEach(function(row) { 
 					ar.push(row.paon_text)
 				})
-				nameChecks.similarNameInUSRN = ar
+				nameChecks.identicalSoundingNameInUSRN = ar
 				resolve()
 			}); // pool.query	
 		})
 	}
 	
-	function similarNameInPostcodeSector () { 
+	function identicalSoundingNameInPostcodeSector () { 
 		return new Promise (function (resolve, reject) {
 			pool.query('SELECT paon_text, metaphone($1, 255) FROM node_schema.llpg_all_live_addresses WHERE postcode_sector = $2 AND metaphone(paon_text, 255) = metaphone($1, 255)', [q.newHouseName, recordDetail.postcode_sector], function(err, results) {
 				if (err) {
@@ -190,7 +190,7 @@ router.get('/nameCheck', function(req, res) {
 				results.rows.forEach(function(row) { 
 					ar.push(row.paon_text)
 				})
-				nameChecks.similarNameInPostcodeSector = ar
+				nameChecks.identicalSoundingNameInPostcodeSector = ar
 				resolve()
 			}); // pool.query	
 		})
@@ -221,8 +221,8 @@ router.get('/nameCheck', function(req, res) {
 			profanityCheck(),
 			identicalNameInUSRN(),
 			identicalNameInPostcodeSector(),
-			similarNameInUSRN(),
-			similarNameInPostcodeSector()
+			identicalSoundingNameInUSRN(),
+			identicalSoundingNameInPostcodeSector()
 		])
 		.then(function () {
 				res.json({
