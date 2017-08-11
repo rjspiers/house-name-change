@@ -78,10 +78,23 @@
         </form>
       </div>
       
+	  <!-- loading spinner -->
 	  <div class="loader" ng-show="loading===true"></div>
-	  <div ng-show="hasNewHouseNameBeenChecked===true && loading===false">
-        <h3>Rule results</h3>
-        <p>See which rules have passed or failed</p>
+	  
+	  <!-- show if all rules passed -->
+	  <div ng-show="hasNewHouseNameBeenChecked===true && loading===false && nameCheckResponse.data.nameChecks.summary.pass===true">
+		<h3>Result</h3>
+		<h3><span class="label label-success">Pass</span></h3>
+		<br>
+        <p>Your proposed name of <strong>"{{newHouseName}}"</strong> has passed all automated checks. To apply to change your house name please submit <strong>"{{newHouseName}}"</strong> to our <a href="https://www.guildford.gov.uk/article/18875/House-name-change-request-form">House Name Change Request Form</a>.</p>
+	  </div>
+	  
+	  <!-- show if any rules failed -->
+	  <div ng-show="hasNewHouseNameBeenChecked===true && loading===false && nameCheckResponse.data.nameChecks.summary.pass===false">
+        <h3>Result</h3>
+		<h3><span class="label label-danger">Fail</span></h3>
+		<br>
+        <p>Your proposed name of <strong>"{{newHouseName}}"</strong> has failed some automated checks. Please review the house name rules below and try another name.</p>
 		<div class="container-fluid">
 			<table class="table table-striped table-bordered">
 				<tr>
@@ -90,64 +103,72 @@
 					<th>Example</th>
 				</tr>
 				<tr>
+					<td>Profanity Detection</td>
+					<td ng-show="nameCheckResponse.data.nameChecks.rule.profanityDetected===true"><h3><span class="label label-warning">Warning</span></h3></td>
+					<td ng-show="nameCheckResponse.data.nameChecks.rule.profanityDetected===false"><h3><span class="label label-success">Pass</span></h3></td>
+					<td ng-show="nameCheckResponse.data.nameChecks.rule.profanityDetected===true"><p>Possible profanity detected - consider if name might be easily vandalised.</p></td>
+					<td ng-show="nameCheckResponse.data.nameChecks.rule.profanityDetected===false"></td>
+				</tr>
+				<tr>
 					<td>Identical Names in Same Street</td>
-					<td ng-show="nameCheckResponse.data.nameChecks.identicalNameInUSRN.length"><h3><span class="label label-danger">Fail</span></h3></td>
-					<td ng-show="nameCheckResponse.data.nameChecks.identicalNameInUSRN.length === 0"><h3><span class="label label-success">Pass</span></h3></td>
-					<td ng-show="nameCheckResponse.data.nameChecks.identicalNameInUSRN.length"><pre>{{nameCheckResponse.data.nameChecks.identicalNameInUSRN | json}}</pre></td>
-					<td ng-show="nameCheckResponse.data.nameChecks.identicalNameInUSRN.length === 0"></td>
+					<td ng-show="!nameCheckResponse.data.nameChecks.rule.identicalNameInUSRN.pass"><h3><span class="label label-danger">Fail</span></h3></td>
+					<td ng-show="nameCheckResponse.data.nameChecks.rule.identicalNameInUSRN.pass"><h3><span class="label label-success">Pass</span></h3></td>
+					<td ng-show="!nameCheckResponse.data.nameChecks.rule.identicalNameInUSRN.pass"><pre>{{nameCheckResponse.data.nameChecks.rule.identicalNameInUSRN.data | json}}</pre></td>
+					<td ng-show="nameCheckResponse.data.nameChecks.rule.identicalNameInUSRN.pass"></td>
 				</tr>
 				<tr>
 					<td>Identical Names in Same Postcode Sector</td>
-					<td ng-show="nameCheckResponse.data.nameChecks.identicalNameInPostcodeSector.length"><h3><span class="label label-danger">Fail</span></h3></td>
-					<td ng-show="nameCheckResponse.data.nameChecks.identicalNameInPostcodeSector.length === 0"><h3><span class="label label-success">Pass</span></h3></td>
-					<td ng-show="nameCheckResponse.data.nameChecks.identicalNameInPostcodeSector.length"><pre>{{nameCheckResponse.data.nameChecks.identicalNameInPostcodeSector | json}}</pre></td>
-					<td ng-show="nameCheckResponse.data.nameChecks.identicalNameInPostcodeSector.length === 0"></td>
+					<td ng-show="!nameCheckResponse.data.nameChecks.rule.identicalNameInPostcodeSector.pass"><h3><span class="label label-danger">Fail</span></h3></td>
+					<td ng-show="nameCheckResponse.data.nameChecks.rule.identicalNameInPostcodeSector.pass"><h3><span class="label label-success">Pass</span></h3></td>
+					<td ng-show="!nameCheckResponse.data.nameChecks.rule.identicalNameInPostcodeSector.pass"><pre>{{nameCheckResponse.data.nameChecks.rule.identicalNameInPostcodeSector.data | json}}</pre></td>
+					<td ng-show="nameCheckResponse.data.nameChecks.rule.identicalNameInPostcodeSector.pass"></td>
 				</tr>
 				<tr>
-					<td>Similar Sounding Names in Same Street</td>
-					<td ng-show="nameCheckResponse.data.nameChecks.identicalSoundingNameInUSRN.length"><h3><span class="label label-danger">Fail</span></h3></td>
-					<td ng-show="nameCheckResponse.data.nameChecks.identicalSoundingNameInUSRN.length === 0"><h3><span class="label label-success">Pass</span></h3></td>
-					<td ng-show="nameCheckResponse.data.nameChecks.identicalSoundingNameInUSRN.length"><pre>{{nameCheckResponse.data.nameChecks.identicalSoundingNameInUSRN | json}}</pre></td>
-					<td ng-show="nameCheckResponse.data.nameChecks.identicalSoundingNameInUSRN.length === 0"></td>
+					<td>Identical Sounding Names in Same Street</td>
+					<td ng-show="!nameCheckResponse.data.nameChecks.rule.identicalSoundingNameInUSRN.pass"><h3><span class="label label-danger">Fail</span></h3></td>
+					<td ng-show="nameCheckResponse.data.nameChecks.rule.identicalSoundingNameInUSRN.pass"><h3><span class="label label-success">Pass</span></h3></td>
+					<td ng-show="!nameCheckResponse.data.nameChecks.rule.identicalSoundingNameInUSRN.pass"><pre>{{nameCheckResponse.data.nameChecks.rule.identicalSoundingNameInUSRN.data | json}}</pre></td>
+					<td ng-show="nameCheckResponse.data.nameChecks.rule.identicalSoundingNameInUSRN.pass"></td>
 				</tr>
 				<tr>
-					<td>Similar Sounding Names Same Postcode Sector</td>
-					<td ng-show="nameCheckResponse.data.nameChecks.identicalSoundingNameInPostcodeSector.length"><h3><span class="label label-danger">Fail</span></h3></td>
-					<td ng-show="nameCheckResponse.data.nameChecks.identicalSoundingNameInPostcodeSector.length === 0"><h3><span class="label label-success">Pass</span></h3></td>
-					<td ng-show="nameCheckResponse.data.nameChecks.identicalSoundingNameInPostcodeSector.length"><pre>{{nameCheckResponse.data.nameChecks.identicalSoundingNameInPostcodeSector | json}}</pre></td>
-					<td ng-show="nameCheckResponse.data.nameChecks.identicalSoundingNameInPostcodeSector.length === 0"></td>
+					<td>Identical Sounding Names Same Postcode Sector</td>
+					<td ng-show="!nameCheckResponse.data.nameChecks.rule.identicalSoundingNameInPostcodeSector.pass"><h3><span class="label label-danger">Fail</span></h3></td>
+					<td ng-show="nameCheckResponse.data.nameChecks.rule.identicalSoundingNameInPostcodeSector.pass"><h3><span class="label label-success">Pass</span></h3></td>
+					<td ng-show="!nameCheckResponse.data.nameChecks.rule.identicalSoundingNameInPostcodeSector.pass"><pre>{{nameCheckResponse.data.nameChecks.rule.identicalSoundingNameInPostcodeSector.data | json}}</pre></td>
+					<td ng-show="nameCheckResponse.data.nameChecks.rule.identicalSoundingNameInPostcodeSector.pass"></td>
 				</tr>
 				<tr>
-					<td>Profanity Detection</td>
-					<td ng-show="nameCheckResponse.data.nameChecks.profanityDetected===true"><h3><span class="label label-warning">Warning</span></h3></td>
-					<td ng-show="nameCheckResponse.data.nameChecks.profanityDetected===false"><h3><span class="label label-success">Pass</span></h3></td>
-					<td ng-show="nameCheckResponse.data.nameChecks.profanityDetected===true"><p>Possible profanity detected - consider if name might be easily vandalised.</p></td>
-					<td ng-show="nameCheckResponse.data.nameChecks.profanityDetected===false"></td>
+					<td>Identical Name with Different Reserved Suffix in Same Street</td>
+					<td ng-show="!nameCheckResponse.data.nameChecks.rule.suffix.identicalNameDifferentSuffixInUSRN.pass"><h3><span class="label label-danger">Fail</span></h3></td>
+					<td ng-show="nameCheckResponse.data.nameChecks.rule.suffix.identicalNameDifferentSuffixInUSRN.pass"><h3><span class="label label-success">Pass</span></h3></td>
+					<td ng-show="!nameCheckResponse.data.nameChecks.rule.suffix.identicalNameDifferentSuffixInUSRN.pass"><pre>{{nameCheckResponse.data.nameChecks.rule.suffix.identicalNameDifferentSuffixInUSRN.data | json}}</pre></td>
+					<td ng-show="nameCheckResponse.data.nameChecks.rule.suffix.identicalNameDifferentSuffixInUSRN.pass"></td>
+				</tr>
+				<tr>
+					<td>Identical Name with Different Reserved Suffix in Same Postcode Sector</td>
+					<td ng-show="!nameCheckResponse.data.nameChecks.rule.suffix.identicalNameDifferentSuffixInPostcodeSector.pass"><h3><span class="label label-danger">Fail</span></h3></td>
+					<td ng-show="nameCheckResponse.data.nameChecks.rule.suffix.identicalNameDifferentSuffixInPostcodeSector.pass"><h3><span class="label label-success">Pass</span></h3></td>
+					<td ng-show="!nameCheckResponse.data.nameChecks.rule.suffix.identicalNameDifferentSuffixInPostcodeSector.pass"><pre>{{nameCheckResponse.data.nameChecks.rule.suffix.identicalNameDifferentSuffixInPostcodeSector.data | json}}</pre></td>
+					<td ng-show="nameCheckResponse.data.nameChecks.rule.suffix.identicalNameDifferentSuffixInPostcodeSector.pass"></td>
+				</tr>
+				<tr>
+					<td>Identical Sounding Name with Different Reserved Suffix in Same Street</td>
+					<td ng-show="!nameCheckResponse.data.nameChecks.rule.suffix.identicalSoundingNameDifferentSuffixInUSRN.pass"><h3><span class="label label-danger">Fail</span></h3></td>
+					<td ng-show="nameCheckResponse.data.nameChecks.rule.suffix.identicalSoundingNameDifferentSuffixInUSRN.pass"><h3><span class="label label-success">Pass</span></h3></td>
+					<td ng-show="!nameCheckResponse.data.nameChecks.rule.suffix.identicalSoundingNameDifferentSuffixInUSRN.pass"><pre>{{nameCheckResponse.data.nameChecks.rule.suffix.identicalSoundingNameDifferentSuffixInUSRN.data | json}}</pre></td>
+					<td ng-show="nameCheckResponse.data.nameChecks.rule.suffix.identicalSoundingNameDifferentSuffixInUSRN.pass"></td>
+				</tr>
+				<tr>
+					<td>Identical Sounding Name with Different Reserved Suffix in Same Postcode Sector</td>
+					<td ng-show="!nameCheckResponse.data.nameChecks.rule.suffix.identicalSoundingNameDifferentSuffixInPostcodeSector.pass"><h3><span class="label label-danger">Fail</span></h3></td>
+					<td ng-show="nameCheckResponse.data.nameChecks.rule.suffix.identicalSoundingNameDifferentSuffixInPostcodeSector.pass"><h3><span class="label label-success">Pass</span></h3></td>
+					<td ng-show="!nameCheckResponse.data.nameChecks.rule.suffix.identicalSoundingNameDifferentSuffixInPostcodeSector.pass"><pre>{{nameCheckResponse.data.nameChecks.rule.suffix.identicalSoundingNameDifferentSuffixInPostcodeSector.data | json}}</pre></td>
+					<td ng-show="nameCheckResponse.data.nameChecks.rule.suffix.identicalSoundingNameDifferentSuffixInPostcodeSector.pass"></td>
 				</tr>
 			</table>
 		</div>
       </div>
 	  
-      <!--show summary and submit house name change request-->
-      <!--TODO add if name has been checked and is acceptable-->
-	  <!-- hide submit button for test -->
-      <!-- <div ng-show="hasNewHouseNameBeenChecked === true">
-        <h3>Summary before submit</h3>
-        <p>Please check the following details are what you are requesting. Then hit submit and we will process the change.</p>
-        <form ng-submit="submitHouseNameChangeRequest()">
-          <div class="form-group">
-            <div class="input-group">
-              <p ng-repeat="x in selectedAddress.data">Current Address: {{x.uprn}} | {{x.property}} | {{x.street}}</p>
-              <p>New Address: {{newHouseName}}</p>
-              <span class="input-group-btn">
-                <button type="submit" class="btn btn-primary">Submit Request</button>
-              </span>
-            </div>
-          </div>
-        </form>
-        
-      </div> -->
-
     </div> 
     <!--end angular app-->
     

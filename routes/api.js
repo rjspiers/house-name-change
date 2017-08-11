@@ -9,6 +9,8 @@ const winston = require('winston')
 const pool = require('../lib/db');
 const logger = winston.loggers.get('logger')
 
+const apiFunctions = require('../lib/apiFunctions')
+
 router.get('/', function(req, res) {
     res.setHeader('Content-Type', 'application/json');
     res.send(JSON.stringify({ api_message: "api is here" }, null, 2));
@@ -102,16 +104,46 @@ router.get('/nameCheck', function(req, res) {
 	// q.uprn & q.newHouseName
 	var q = req.query
 	
+	/* ideal json */
 	nameChecks = {}
-	nameChecks.profanityDetected = null
-	nameChecks.identicalNameInUSRN = {}
-	nameChecks.identicalNameInPostcodeSector = {}
-	nameChecks.identicalSoundingNameInUSRN = {}
-	nameChecks.identicalSoundingNameInPostcodeSector = {}
 	nameChecks.recordDetail = {}
-	
 	recordDetail = {}
 	recordDetail.uprn = {}
+	
+	nameChecks.summary = {}
+	nameChecks.summary.pass = null
+	
+	nameChecks.rule = {}
+	nameChecks.rule.profanityDetected = null
+	nameChecks.rule.identicalNameInUSRN = {}
+	nameChecks.rule.identicalNameInUSRN.pass = false
+	nameChecks.rule.identicalNameInUSRN.data = []
+	nameChecks.rule.identicalNameInPostcodeSector = {}
+	nameChecks.rule.identicalNameInPostcodeSector.pass = false
+	nameChecks.rule.identicalNameInPostcodeSector.data = []
+	nameChecks.rule.identicalSoundingNameInUSRN = {}
+	nameChecks.rule.identicalSoundingNameInUSRN.pass = false
+	nameChecks.rule.identicalSoundingNameInUSRN.data = []
+	nameChecks.rule.identicalSoundingNameInPostcodeSector = {}
+	nameChecks.rule.identicalSoundingNameInPostcodeSector.pass = false
+	nameChecks.rule.identicalSoundingNameInPostcodeSector.data = []
+	
+	nameChecks.rule.suffix = {}
+	nameChecks.rule.suffix.isLastWordReservedSuffix = null
+	nameChecks.rule.suffix.message = {}
+	nameChecks.rule.suffix.identicalNameDifferentSuffixInUSRN = {}
+	nameChecks.rule.suffix.identicalNameDifferentSuffixInUSRN.pass = null
+	nameChecks.rule.suffix.identicalNameDifferentSuffixInUSRN.data = []
+	nameChecks.rule.suffix.identicalNameDifferentSuffixInPostcodeSector = {}
+	nameChecks.rule.suffix.identicalNameDifferentSuffixInPostcodeSector.pass = null
+	nameChecks.rule.suffix.identicalNameDifferentSuffixInPostcodeSector.data = []
+	nameChecks.rule.suffix.identicalSoundingNameDifferentSuffixInUSRN = {}
+	nameChecks.rule.suffix.identicalSoundingNameDifferentSuffixInUSRN.pass = null
+	nameChecks.rule.suffix.identicalSoundingNameDifferentSuffixInUSRN.data = []
+	nameChecks.rule.suffix.identicalSoundingNameDifferentSuffixInPostcodeSector = {}
+	nameChecks.rule.suffix.identicalSoundingNameDifferentSuffixInPostcodeSector.pass = null
+	nameChecks.rule.suffix.identicalSoundingNameDifferentSuffixInPostcodeSector.data = []
+	/* end */
 	
 	function getRecordDetail () { 
 		return new Promise (function (resolve, reject) {
@@ -142,7 +174,10 @@ router.get('/nameCheck', function(req, res) {
 				results.rows.forEach(function(row) { 
 					ar.push(row.paon_text)
 				})
-				nameChecks.identicalNameInUSRN = ar
+				nameChecks.rule.identicalNameInUSRN.data = ar
+				if (ar.length === 0) {
+					nameChecks.rule.identicalNameInUSRN.pass = true
+				}
 				resolve()
 			}); // pool.query	
 		})
@@ -158,7 +193,10 @@ router.get('/nameCheck', function(req, res) {
 				results.rows.forEach(function(row) { 
 					ar.push(row.paon_text)
 				})
-				nameChecks.identicalNameInPostcodeSector = ar
+				nameChecks.rule.identicalNameInPostcodeSector.data = ar
+				if (ar.length === 0) {
+					nameChecks.rule.identicalNameInPostcodeSector.pass = true
+				}
 				resolve()
 			}); // pool.query	
 		})
@@ -174,7 +212,10 @@ router.get('/nameCheck', function(req, res) {
 				results.rows.forEach(function(row) { 
 					ar.push(row.paon_text)
 				})
-				nameChecks.identicalSoundingNameInUSRN = ar
+				nameChecks.rule.identicalSoundingNameInUSRN.data = ar
+				if (ar.length === 0) {
+					nameChecks.rule.identicalSoundingNameInUSRN.pass = true
+				}
 				resolve()
 			}); // pool.query	
 		})
@@ -190,7 +231,10 @@ router.get('/nameCheck', function(req, res) {
 				results.rows.forEach(function(row) { 
 					ar.push(row.paon_text)
 				})
-				nameChecks.identicalSoundingNameInPostcodeSector = ar
+				nameChecks.rule.identicalSoundingNameInPostcodeSector.data = ar
+				if (ar.length === 0) {
+					nameChecks.rule.identicalSoundingNameInPostcodeSector.pass = true
+				}
 				resolve()
 			}); // pool.query	
 		})
@@ -202,36 +246,81 @@ router.get('/nameCheck', function(req, res) {
 				if (err) {
 					return console.error('error running query', err);
 				}
-				if (results.rows.length > 0) {
-					nameChecks.profanityDetected = true
+				else if (results.rows.length > 0) {
+					nameChecks.rule.profanityDetected = true
 					resolve()
 				} else {
-					nameChecks.profanityDetected = false
+					nameChecks.rule.profanityDetected = false
 					resolve()
 				}
 			}); // pool.query	
 		})
 	}
+		
+	function checkSuffix () {
+		return new Promise (function (resolve, reject) {
+			Promise.all([
+				apiFunctions.isLastWordReservedSuffix(q.newHouseName)
+			]).then(function () {
+				if (nameChecks.rule.suffix.isLastWordReservedSuffix === false) {
+					nameChecks.rule.suffix.identicalNameDifferentSuffixInUSRN.pass = true
+					nameChecks.rule.suffix.identicalNameDifferentSuffixInPostcodeSector.pass = true
+					nameChecks.rule.suffix.identicalSoundingNameDifferentSuffixInUSRN.pass = true
+					nameChecks.rule.suffix.identicalSoundingNameDifferentSuffixInPostcodeSector.pass = true
+					resolve()
+				// if isLastWordReservedSuffix = true
+				} else if (nameChecks.rule.suffix.isLastWordReservedSuffix === true) {
+					var beforeLastWord = q.newHouseName
+					var lastIndex = beforeLastWord.lastIndexOf(" ")
+					beforeLastWord = beforeLastWord.substring(0, lastIndex)
+					
+					Promise.all([
+						apiFunctions.identicalNameDifferentSuffixInUSRN(beforeLastWord, recordDetail.usrn),
+						apiFunctions.identicalNameDifferentSuffixInPostcodeSector(beforeLastWord, recordDetail.postcode_sector),
+						apiFunctions.identicalSoundingNameDifferentSuffixInUSRN(beforeLastWord, recordDetail.usrn),
+						apiFunctions.identicalSoundingNameDifferentSuffixInPostcodeSector(beforeLastWord, recordDetail.postcode_sector),
+					]).then(function (results) {
+						// logger.debug(results[0])
+						resolve()
+					})
+				} 
+			})
+		})
+	}
 	
 	Promise.all([
 		getRecordDetail(),
-	])
-	.then(function () {
+	]).then(function () {
 		Promise.all([
 			profanityCheck(),
 			identicalNameInUSRN(),
 			identicalNameInPostcodeSector(),
 			identicalSoundingNameInUSRN(),
-			identicalSoundingNameInPostcodeSector()
-		])
-		.then(function () {
-				res.json({
-					status: 'success',
-					message: 'here is the data',
-					nameChecks: nameChecks
-				})
+			identicalSoundingNameInPostcodeSector(),
+			checkSuffix(),
+		]).then(function () {
+			if (
+				nameChecks.rule.profanityDetected === false
+				&& nameChecks.rule.identicalNameInUSRN.pass === true
+				&& nameChecks.rule.identicalNameInPostcodeSector.pass === true
+				&& nameChecks.rule.identicalSoundingNameInUSRN.pass === true
+				&& nameChecks.rule.identicalSoundingNameInPostcodeSector.pass === true
+				&& nameChecks.rule.suffix.identicalNameDifferentSuffixInUSRN.pass === true
+				&& nameChecks.rule.suffix.identicalNameDifferentSuffixInPostcodeSector.pass === true
+				&& nameChecks.rule.suffix.identicalSoundingNameDifferentSuffixInUSRN.pass === true
+				&& nameChecks.rule.suffix.identicalSoundingNameDifferentSuffixInPostcodeSector.pass === true
+			) {
+				nameChecks.summary.pass = true
+			} else {
+				nameChecks.summary.pass = false
 			}
-		);
+		}).then(function () {
+			res.json({
+				status: 'success',
+				message: 'here is the data',
+				nameChecks: nameChecks
+			})
+		});
 	});
 	
 }); // app.get

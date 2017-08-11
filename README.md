@@ -37,25 +37,62 @@ Example response:
   "status": "success",
   "message": "here is the data",
   "nameChecks": {
-    "profanityDetected": false,
-    "identicalNameInUSRN": [
-      "BEECHANGER"
-    ],
-    "identicalNameInPostcodeSector": [
-      "BEECHANGER"
-    ],
-    "identicalSoundingNameInUSRN": [
-      "BEECHANGER"
-    ],
-    "identicalSoundingNameInPostcodeSector": [
-      "BEECHANGER"
-    ],
     "recordDetail": {
       "uprn": "10007060106",
       "usrn": 16002556,
       "isparent": "0",
       "ischild": "0",
       "postcode_sector": "GU5 9"
+    },
+    "summary": {
+      "pass": false
+    },
+    "rule": {
+      "profanityDetected": false,
+      "identicalNameInUSRN": {
+        "pass": false,
+        "data": [
+          "BEECHANGER"
+        ]
+      },
+      "identicalNameInPostcodeSector": {
+        "pass": false,
+        "data": [
+          "BEECHANGER"
+        ]
+      },
+      "identicalSoundingNameInUSRN": {
+        "pass": false,
+        "data": [
+          "BEECHANGER"
+        ]
+      },
+      "identicalSoundingNameInPostcodeSector": {
+        "pass": false,
+        "data": [
+          "BEECHANGER"
+        ]
+      },
+      "suffix": {
+        "isLastWordReservedSuffix": false,
+        "message": "single word only",
+        "identicalNameDifferentSuffixInUSRN": {
+          "pass": true,
+          "data": []
+        },
+        "identicalNameDifferentSuffixInPostcodeSector": {
+          "pass": true,
+          "data": []
+        },
+        "identicalSoundingNameDifferentSuffixInUSRN": {
+          "pass": true,
+          "data": []
+        },
+        "identicalSoundingNameDifferentSuffixInPostcodeSector": {
+          "pass": true,
+          "data": []
+        }
+      }
     }
   }
 }
@@ -66,9 +103,17 @@ Example response:
 | status | string | response status |
 | message | string | response message |
 | nameChecks | json | name check results |
+| summary.pass | boolean | true if all rules pass & profanityDetected=false |
+| rule | json | each rule contains `pass` as boolean & `data` as array |
 | profanityDetected | boolean | true if profanity detected |
-| identicalNameInUSRN | array | identical names within the same USRN |
-| identicalNameInPostcodeSector | array | identical names within the same postcode sector (GU1 1) |
-| identicalSoundingNameInUSRN | array | identical sounding names within the same USRN |
-| identicalSoundingNameInPostcodeSector | array | identical sounding names within the same postcode sector (GU1 1) |
+| identicalNameInUSRN | json | identical names within the same USRN |
+| identicalNameInPostcodeSector | json | identical names within the same postcode sector (GU1 1) |
+| identicalSoundingNameInUSRN | json | identical sounding names within the same USRN |
+| identicalSoundingNameInPostcodeSector | json | identical sounding names within the same postcode sector (GU1 1) |
+| suffix | json | grouping for suffix rules |
+| isLastWordReservedSuffix | boolean | true if last word in string is reserved name ending |
+| identicalNameDifferentSuffixInUSRN | json | identical names (before last word) within the same USRN |
+| identicalNameDifferentSuffixInPostcodeSector | json | identical names (before last word) within the same postcode sector (GU1 1) |
+| identicalSoundingNameDifferentSuffixInUSRN | json | identical sounding names (before last word) within the same USRN |
+| identicalSoundingNameDifferentSuffixInPostcodeSector | json | identical sounding names (before last word) within the same postcode sector (GU1 1) |
 | recordDetail | json | data on the requested UPRN used by the API to conduct the name checking |
