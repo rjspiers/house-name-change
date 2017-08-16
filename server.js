@@ -24,7 +24,8 @@ winston.loggers.add('logger', {
 	}
 })
 const logger = winston.loggers.get('logger')
-logger.debug('starting application')
+logger.debug('starting application in node_env: ' + app.settings.env)
+logger.debug('iisnode piped port = ' + process.env.PORT)
 
 // set the view engine to ejs
 app.set('view engine', 'ejs');
@@ -50,5 +51,9 @@ app.use(process.env.iisnodeRoute + '/api', routerApi);
 // c9
 app.listen(process.env.PORT, process.env.IP);
 
-// GBC
+// GBC - running with iisnode
 // app.listen(process.env.PORT);
+
+// use module exports to create a test app for mocha
+// can't get this working with iisnode as: 1. PORT is piped. 2. iisnodeRoute needs to be set.
+// module.exports = app.listen(process.env.PORT);

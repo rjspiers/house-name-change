@@ -117,3 +117,17 @@ Example response:
 | identicalSoundingNameDifferentSuffixInUSRN | json | identical sounding names (before last word) within the same USRN |
 | identicalSoundingNameDifferentSuffixInPostcodeSector | json | identical sounding names (before last word) within the same postcode sector (GU1 1) |
 | recordDetail | json | data on the requested UPRN used by the API to conduct the name checking |
+
+### Tests
+Test suite built with [mocha](https://mochajs.org/) and [chai](http://chaijs.com/).
+
+Tests run by directly accessing the application running on localhost. [iisnode provides a named pipe](https://github.com/tjanczuk/iisnode/issues/46) as the `process.env.PORT` so the app defined in server.js can't be exported with `module.exports = app.listen(process.env.PORT)`.
+
+### http/https
+Application is configured to run through http by default. 
+
+AngularJS $http uses http or https depending on if the application is accessed via http or https.
+
+**To run with https either:**
+- Access through a https proxy (make sure [node errors are allowed to pass through IIS](https://github.com/tjanczuk/iisnode/issues/295))
+- Add a security cert to IIS and access it directly. Use the web-https.config file for an example of redirecting http to https.
