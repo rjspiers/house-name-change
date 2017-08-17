@@ -1,1 +1,1 @@
-node ./node_modules/mocha/bin/mocha --watch
+npm run-script test-watch
