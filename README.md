@@ -12,10 +12,10 @@ A checking service for proposed house name changes
 - URL path to API: [/node/house-name-check/api](https://www2.guildford.gov.uk/node/house-name-check/api)
 - Friendly frontend: https://www2.guildford.gov.uk/node/house-name-check
 
-### API 
-| Method | Endpoint | Params | Description | 
-| ------ | ------ | ------ | ------ | 
-| GET | [/postcode](#postcode) | postcode=string | returns json of Guildford Borough addresses within a postcode | 
+### API
+| Method | Endpoint | Params | Description |
+| ------ | ------ | ------ | ------ |
+| GET | [/postcode](#postcode) | postcode=string | returns json of Guildford Borough addresses within a postcode |
 | GET | [/nameCheck](#namecheck) | <ul><li>uprn=string</li><li>newHouseName=string</li></ul> | returns json of name check results using uprn |
 | GET | /postcodeUk | postcode=string | returns json of addresses within a postcode |
 | GET | /postcodeStatic | - | returns json of addresses within a one postcode |
@@ -25,13 +25,19 @@ A checking service for proposed house name changes
 ### Response Properties
 #### Postcode
 
-[Response example and descriptions](https://github.com/surreydigitalservices/locate-api#presentation)
+[HTTP 200 Response example and descriptions](https://github.com/surreydigitalservices/locate-api#presentation)
+
+**Returns http 422 if:**
+- postcode not valid
+- postcode empty
+- postcode is not within Guildford GSSCode.
+
 
 #### nameCheck
 
 Example request: https://www2.guildford.gov.uk/node/house-name-check/api/nameCheck?newHouseName=beechanger&uprn=10007060106
 
-Example response: 
+**Example http 200 response:**
 ```json
 {
   "status": "success",
@@ -73,6 +79,8 @@ Example response:
           "BEECHANGER"
         ]
       },
+      "isAlphaOrSpace": true,
+      "max255Chars": true,
       "suffix": {
         "isLastWordReservedSuffix": false,
         "message": "single word only",
@@ -98,8 +106,8 @@ Example response:
 }
 ```
 
-| Property | Type | Description | 
-| ------ | ------ | ------ | 
+| Property | Type | Description |
+| ------ | ------ | ------ |
 | status | string | response status |
 | message | string | response message |
 | nameChecks | json | name check results |
@@ -110,6 +118,8 @@ Example response:
 | identicalNameInPostcodeSector | json | identical names within the same postcode sector (GU1 1) |
 | identicalSoundingNameInUSRN | json | identical sounding names within the same USRN |
 | identicalSoundingNameInPostcodeSector | json | identical sounding names within the same postcode sector (GU1 1) |
+| isAlphaOrSpace | boolean | true if newHouseName contains only alpha or whitespace chars |
+| max255Chars | boolean | true if newHouseName length is < 256 chars |
 | suffix | json | grouping for suffix rules |
 | isLastWordReservedSuffix | boolean | true if last word in string is reserved name ending |
 | identicalNameDifferentSuffixInUSRN | json | identical names (before last word) within the same USRN |
@@ -118,15 +128,19 @@ Example response:
 | identicalSoundingNameDifferentSuffixInPostcodeSector | json | identical sounding names (before last word) within the same postcode sector (GU1 1) |
 | recordDetail | json | data on the requested UPRN used by the API to conduct the name checking |
 
+**Returns http 422 if:**
+- `&newHouseName` > 255 chars
+- `&uprn` is not in the LLPG
+
 ### Tests
 Test suite built with [mocha](https://mochajs.org/) and [chai](http://chaijs.com/).
 
 Tests run by directly accessing the application running on localhost. [iisnode provides a named pipe](https://github.com/tjanczuk/iisnode/issues/46) as the `process.env.PORT` so the app defined in server.js can't be exported with `module.exports = app.listen(process.env.PORT)`.
 
 ### http/https
-Application is configured to run through http by default. 
+Application is configured to run through http by default.
 
-AngularJS $http uses http or https depending on if the application is accessed via http or https.
+AngularJS $http uses http or https depending on if the application is served via http or https.
 
 **To run with https either:**
 - Access through a https proxy (make sure [node errors are allowed to pass through IIS](https://github.com/tjanczuk/iisnode/issues/295))
