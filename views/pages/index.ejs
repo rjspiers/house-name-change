@@ -37,7 +37,7 @@
 						<div class="input-group">
 							<input type="text" name="searchValue" ng-model="searchValue" class="form-control" placeholder="Search by postcode">
 							<span class="input-group-btn">
-								<button type="submit" class="btn btn-primary">Search</button>
+								<button type="submit" class="btn btn-primary" ng-disabled="!searchValue">Search</button>
 							</span>
 						</div>
 					</div>
@@ -83,7 +83,7 @@
 						<div class="input-group">
 							<input type="text" name="newHouseName" ng-model="newHouseName" class="form-control" placeholder="Type your new house name">
 							<span class="input-group-btn">
-								<button type="submit" class="btn btn-primary">Check Name</button>
+								<button type="submit" class="btn btn-primary" ng-disabled="!newHouseName">Check Name</button>
 							</span>
 						</div>
 					</div>
