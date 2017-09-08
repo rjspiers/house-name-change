@@ -53,7 +53,7 @@ describe('API Routes', function() {
 	describe('/postcode/', function() {
 		it('/postcode/ should give http 422', function(done) {
 			chai.request(appRoot)
-			.get('/api/postcodeUk/')
+			.get('/api/postcode/')
 			.end(function(err, res){
 				res.should.have.status(422);
 				res.should.be.json;

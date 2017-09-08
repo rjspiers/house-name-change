@@ -1,10 +1,10 @@
 const express = require('express');
 const request = require('request');
 const router = express.Router();
-const bodyParser = require('body-parser')
-const twilio = require('twilio');
+// const bodyParser = require('body-parser')
+// const twilio = require('twilio');
 const Promise = require('bluebird');
-const winston = require('winston')
+const winston = require('winston');
 
 // require('../lib/tools.js')();
 const tools = require('../lib/tools')
@@ -22,7 +22,8 @@ router.get('/', function(req, res) {
 router.get('/testDbConn', function(req, res) {
 	pool.query('SELECT 1 AS number', [], function(err, results) {
 		if (err) {
-			return console.error('error running query', err);
+			res.status(500).json({"error":"internal server error", "err":err, "error-stack":err.stack})
+			return console.error('error running query:', err);
 		}
 		res.json({
 			status: 'success',
@@ -31,18 +32,23 @@ router.get('/testDbConn', function(req, res) {
 	}) // pool.query
 })
 
-// /api/postcodeUk?postcode=gu13au
-router.get('/postcodeUk', function(req, res, next) {
-	var postcode = req.query.postcode;
-	request('https://address.digitalservices.surreyi.gov.uk/addresses?postcode=' + postcode,
+// /api/uprn?uprn=10007099272
+router.get('/uprn', function(req, res, next) {
+	var uprn = req.query.uprn;
+	request('https://address.digitalservices.surreyi.gov.uk/addresses?format=all&uprn=' + uprn,
 		{'auth': {'bearer': process.env.bearerToken}}, function (err, response, body) {
-		if (err || response.statusCode !== 200) {
-			res.status(response.statusCode).json(JSON.parse(body)); // example 422 = {"error":"postcode is invalid"}
-		} else if (response.statusCode === 200) {
+		if (err) {
+			res.status(500).json({"error":"internal server error", "err":err, "error-stack":err.stack})
+			console.error('error:', err);
+		}
+		else if (response.statusCode !== 200) {
+			res.status(response.statusCode).json(JSON.parse(body));
+		}
+		else if (response.statusCode === 200) {
 			res.json(JSON.parse(body));
-		} else {
-			var message = '{"error":"internal server error"}'
-			res.status(500).json(message);
+		}
+		else {
+			res.status(500).json({"error":"internal server error"});
 		}
 	});
 });
@@ -50,23 +56,28 @@ router.get('/postcodeUk', function(req, res, next) {
 // /api/postcode?postcode=gu13au
 router.get('/postcode', function(req, res, next) {
 	var postcode = req.query.postcode;
-	request('https://address.digitalservices.surreyi.gov.uk/addresses?postcode=' + postcode,
-		{'auth': {'bearer': process.env.bearerToken}}, function (err, response, body) {
-		if (err || response.statusCode !== 200) {
+	request('https://address.digitalservices.surreyi.gov.uk/addresses?postcode=' + postcode, {'auth': {'bearer': process.env.bearerToken}}, function (err, response, body) {
+		if (err) {
+			res.status(500).json({"error":"internal server error", "err":err, "error-stack":err.stack})
+			console.error('error:', err);
+		}
+		else if (response.statusCode !== 200) {
 			res.status(response.statusCode).json(JSON.parse(body)); // example 422 = {"error":"postcode is invalid"}
-		} else if (response.statusCode === 200) {
+		}
+		else if (response.statusCode === 200) {
 			var jsonArray = JSON.parse(response.body)
 			var filteredJsonArray = jsonArray.filter(function(obj) {
 				return (obj.gssCode === 'E07000209')
 			})
 			if (filteredJsonArray.length > 0) {
 				res.json(filteredJsonArray);
-			} else if (filteredJsonArray.length === 0) {
+			}
+			else if (filteredJsonArray.length === 0) {
 				res.status(422).json({"error":"no Guildford Borough addresses in this postcode"})
 			}
-		} else {
-			var message = '{"error":"internal server error"}'
-			res.status(500).json(message);
+		}
+		else {
+			res.status(500).json({"error":"internal server error"});
 		}
 	});
 });
@@ -74,30 +85,20 @@ router.get('/postcode', function(req, res, next) {
 // /api/postcodeStatic
 router.get('/postcodeStatic', function(req, res, next) {
 	var postcode = 'gu13au';
-	request('https://address.digitalservices.surreyi.gov.uk/addresses?postcode=' + postcode,
-		{'auth': {'bearer': process.env.bearerToken}}, function (err, response, body) {
-		if (err || response.statusCode !== 200) {
+	request('https://address.digitalservices.surreyi.gov.uk/addresses?postcode=' + postcode, {'auth': {'bearer': process.env.bearerToken}}, function (err, response, body) {
+		if (err) {
+			res.status(500).json({"error":"internal server error", "err":err, "error-stack":err.stack})
+			console.error('error:', err);
+		}
+		else if (response.statusCode !== 200) {
 			res.status(response.statusCode).json(JSON.parse(body)); // example 422 = {"error":"postcode is invalid"}
-		} else if (response.statusCode === 200) {
+		}
+		else if (response.statusCode === 200) {
 			res.json(JSON.parse(body));
-		} else {
-			var message = '{"error":"internal server error"}'
-			res.status(500).json(message);
 		}
-	});
-});
-
-// /api/uprn?uprn=10007099272
-router.get('/uprn', function(req, res, next) {
-	var uprn = req.query.uprn;
-	request('https://address.digitalservices.surreyi.gov.uk/addresses?format=all&uprn=' + uprn,
-		{'auth': {'bearer': process.env.bearerToken}}, function (err, response, body) {
-		if (err || response.statusCode !== 200) {
-		  return res.sendStatus(500);
+		else {
+			res.status(500).json({"error":"internal server error"});
 		}
-		//res.render('index', { title : 'Main page', news : JSON.parse(body) });
-		res.setHeader('Content-Type', 'application/json');
-		res.send(JSON.parse(body));
 	});
 });
 
@@ -107,7 +108,8 @@ router.get('/isNumeric', function(req, res) {
 		logger.debug(result)
 		if (result === false) {
 			return res.status(422).json({"isNumeric":result})
-		} else if (result === true) {
+		}
+		else if (result === true) {
 			return res.status(200).json({"isNumeric":result})
 		}
 	})
@@ -119,7 +121,8 @@ router.get('/isAlphaOrSpace', function(req, res) {
 		logger.debug(result)
 		if (result === false) {
 			return res.status(422).json({"isAlphaOrSpace":result})
-		} else if (result === true) {
+		}
+		else if (result === true) {
 			return res.status(200).json({"isAlphaOrSpace":result})
 		}
 	})
@@ -208,9 +211,14 @@ router.get('/nameCheck', function(req, res) {
 						&& nameChecks.rule.max255Chars === true
 					) {
 						nameChecks.summary.pass = true
-					} else {
+					}
+					else {
 						nameChecks.summary.pass = false
 					}
+				})
+				// TODO: move this .catch to the end of the promise
+				.catch(function () {
+					res.status(500).json({"error":"Internal server error"})
 				})
 				.then(function () {
 					res.json({
@@ -221,8 +229,9 @@ router.get('/nameCheck', function(req, res) {
 				});
 			},
 			// onRejected - apiFunctions.getRecordDetail(q.uprn)
-			function () {
-				res.status(422).json({"error":"No valid uprn match in LLPG database. Is the submitted UPRN correct?"})
+			function ({status, error}) {
+				// this can be 422 or 500
+				res.status(status).json({"error":error})
 			}
 		)
 		},
